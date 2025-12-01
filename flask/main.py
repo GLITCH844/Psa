@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 import re
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 def check_strength(password):
     score = 0
@@ -37,5 +37,5 @@ def index():
 
     return render_template("index.html", strength=strength, rules=rules)
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     app.run(debug=True)

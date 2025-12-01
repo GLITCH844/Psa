@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Password Strength Analyzer</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 50px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .weak { background: #ffcccc; }
+        .medium { background: #fff6cc; }
+        .strong { background: #ccffcc; }
+    </style>
+</head>
+<body>
+    <h2>Password Strength Analyzer</h2>
+
+    <form method="POST">
+        <input type="password" name="password" placeholder="Enter password" required>
+        <button type="submit">Check Strength</button>
+    </form>
+
+    {% if strength %}
+        <div class="result {{ strength|lower }}">
+            <h3>Strength: {{ strength }}</h3>
+            <h4>Rule Breakdown:</h4>
+            <ul>
+                {% for rule, passed in rules.items() %}
+                    <li>{{ rule }}: {{ "✔" if passed else "❌" }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+</body>
+</html>
