@@ -4,10 +4,10 @@ def check_strength(password):
     score = 0
     rules = {
         "Length at least 8": len(password) >= 8,
-        "Contains lowercase": bool(re.search(r"[a-z]", password)),
-        "Contains uppercase": bool(re.search(r"[A-Z]", password)),
-        "Contains digits": bool(re.search(r"[0-9]", password)),
-        "Contains special characters": bool(re.search(r"[^A-Za-z0-9]", password))
+        "Must Contains lowercase": bool(re.search(r"[a-z]", password)),
+        "Must Contains uppercase": bool(re.search(r"[A-Z]", password)),
+        "Must Contains digits": bool(re.search(r"[0-9]", password)),
+        "Must Contains special characters": bool(re.search(r"[^A-Za-z0-9]", password))
     }
 
     for rule, passed in rules.items():
@@ -24,7 +24,7 @@ def check_strength(password):
     return strength, rules
 
 
-password = input("Enter password: ")
+password = input("Enter your password: ")
 
 strength, rule_results = check_strength(password)
 
