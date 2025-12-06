@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, jsonify
 import re
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # Simple dictionary blacklist
 COMMON_WORDS = [
     "password", "admin", "welcome", "qwerty", "abc123",
-    "custech", "iloveyou", "football", "monkey", "dragon"
+    "custech", "24L1CY", "CUSTECH", "UG1234", "ug1234"
 ]
 
 def check_dictionary(password):
@@ -18,11 +18,11 @@ def check_dictionary(password):
 
 def analyze_password(password):
     rules = {
-        "Length ≥ 8": len(password) >= 8,
-        "Contains lowercase": bool(re.search(r"[a-z]", password)),
-        "Contains uppercase": bool(re.search(r"[A-Z]", password)),
-        "Contains number": bool(re.search(r"\d", password)),
-        "Contains special symbol": bool(re.search(r"[^A-Za-z0-9]", password)),
+        "Length at least ≥ 8": len(password) >= 8,
+        "Must Contains lowercase": bool(re.search(r"[a-z]", password)),
+        "Must Contains uppercase": bool(re.search(r"[A-Z]", password)),
+        "Must Contains number": bool(re.search(r"\d", password)),
+        "Must Contains special symbol": bool(re.search(r"[^A-Za-z0-9]", password)),
         "Not a dictionary word": not check_dictionary(password)
     }
 
@@ -56,5 +56,5 @@ def check():
         "rules": rules
     })
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     app.run(debug=True)

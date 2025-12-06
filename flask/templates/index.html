@@ -3,39 +3,104 @@
 <head>
     <title>Password Strength Analyzer</title>
     <style>
-        body {
+        body{
             font-family: Arial;
-            margin: 50px;
+            background:#f2f2f2;
+            padding:20px;
         }
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 8px;
+
+        .container{
+            max-width:500px;
+            margin:auto;
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0 0 10px rgba(0,0,0,.1);
         }
-        .weak { background: #ffcccc; }
-        .medium { background: #fffecc; }
-        .strong { background: #ccffcc; }
+
+        input{
+            width:100%;
+            padding:10px;
+            margin-top:5px;
+        }
+
+        .bar{
+            height:20px;
+            margin-top:5px;
+            border-radius:10px;
+            background:#ddd;
+            overflow:hidden;
+        }
+
+        .fill{
+            height:100%;
+            width:0%;
+            transition:.3s;
+        }
+
+        ul{
+            padding-left:15px;
+        }
     </style>
 </head>
 <body>
-    <h2>Password Strength Analyzer</h2>
 
-    <form method="POST">
-        <input type="password" name="password" placeholder="Enter password" required>
-        <button type="submit">Check Strength</button>
-    </form>
+<div class="container">
+<h2>Password Strength Analyzer</h2>
 
-    {% if strength %}
-        <div class="result {{ strength|lower }}">
-            <h3>Strength: {{ strength }}</h3>
-            <h4>Rule Breakdown:</h4>
-            <ul>
-                {% for rule, passed in rules.items() %}
-                    <li>{{ rule }}: {{ "✔" if passed else "❌" }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
+<input type="password" id="password" placeholder="Type password">
+
+<div class="bar">
+    <div id="fill" class="fill"></div>
+</div>
+
+<h3 id="label"></h3>
+
+<ul id="rules"></ul>
+</div>
+
+<script>
+const input = document.getElementById("password");
+const fill = document.getElementById("fill");
+const label = document.getElementById("label");
+const rulesList = document.getElementById("rules");
+
+input.onkeyup = async function(){
+    
+    let password = input.value;
+
+    const res = await fetch("/check",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({password})
+    });
+
+    const data = await res.json();
+
+    fill.style.width = data.percent+"%";
+    
+    if(data.strength==="Weak"){
+        fill.style.background="red";
+    }
+    else if(data.strength==="Medium"){
+        fill.style.background="orange";
+    }
+    else{
+        fill.style.background="green";
+    }
+
+    label.innerText = "Strength: " + data.strength;
+
+    rulesList.innerHTML = "";
+
+    for(const rule in data.rules){
+        const li = document.createElement("li");
+        li.innerHTML = rule + " : " + (data.rules[rule] ? "✔" : "❌");
+        rulesList.appendChild(li);
+    }
+
+}
+</script>
 
 </body>
 </html>
