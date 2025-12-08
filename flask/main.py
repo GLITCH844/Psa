@@ -3,30 +3,37 @@ import re
 
 app = Flask(__name__)
 
-# Simple dictionary blacklist
+# Blacklist dictionary
 COMMON_WORDS = [
-    "password", "admin", "welcome", "qwerty", "abc123",
-    "custech", "24L1CY", "CUSTECH", "UG1234", "ug1234"
+    "password", "admin", "welcome", "qwerty",
+    "abc123", "letmein", "custech",
+    "24L!CY", "UG1234", "school"
 ]
 
-def check_dictionary(password):
-    password_lower = password.lower()
+def contains_dictionary_word(password):
+    password = password.lower()
+    
     for word in COMMON_WORDS:
-        if word in password_lower:
-            return True
-    return False
+        if word in password:
+            return word   # RETURN THE MATCHED WORD
+            
+    return None
 
 def analyze_password(password):
+
+    matched_word = contains_dictionary_word(password)
+
     rules = {
-        "Length at least ≥ 8": len(password) >= 8,
-        "Must Contains lowercase": bool(re.search(r"[a-z]", password)),
-        "Must Contains uppercase": bool(re.search(r"[A-Z]", password)),
-        "Must Contains number": bool(re.search(r"\d", password)),
-        "Must Contains special symbol": bool(re.search(r"[^A-Za-z0-9]", password)),
-        "Not a dictionary word": not check_dictionary(password)
+        "Length ≥ 8": len(password) >= 8,
+        "Contains lowercase": bool(re.search(r"[a-z]", password)),
+        "Contains uppercase": bool(re.search(r"[A-Z]", password)),
+        "Contains number": bool(re.search(r"\d", password)),
+        "Contains special symbol": bool(re.search(r"[^A-Za-z0-9]", password)),
+        "No common/predictable words": matched_word is None
     }
 
     score = sum(rules.values())
+    total_rules = len(rules)
 
     if score <= 2:
         strength = "Weak"
@@ -35,9 +42,13 @@ def analyze_password(password):
     else:
         strength = "Strong"
 
-    percent = int((score / len(rules)) * 100)
+    percent = int((score / total_rules) * 100)
 
-    return strength, percent, rules
+    warning = None
+    if matched_word:
+        warning = f"⚠ Predictable password detected: '{matched_word}'"
+
+    return strength, percent, warning, rules
 
 @app.route("/")
 def index():
@@ -45,14 +56,16 @@ def index():
 
 @app.route("/check", methods=["POST"])
 def check():
-    data = request.get_json()
-    password = data.get("password")
 
-    strength, percent, rules = analyze_password(password)
+    data = request.get_json()
+    password = data.get("password", "")
+
+    strength, percent, warning, rules = analyze_password(password)
 
     return jsonify({
         "strength": strength,
         "percent": percent,
+        "warning": warning,
         "rules": rules
     })
 

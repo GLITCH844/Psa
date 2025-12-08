@@ -3,6 +3,10 @@
 <head>
     <title>Password Strength Analyzer</title>
     <style>
+        .warning{
+            color: red;
+            font-weight: bold;
+        }
         body{
             font-family: Arial;
             background:#f2f2f2;
@@ -53,6 +57,7 @@
 <div class="bar">
     <div id="fill" class="fill"></div>
 </div>
+<div id="warning" class="warning"></div>
 
 <h3 id="label"></h3>
 
@@ -60,6 +65,7 @@
 </div>
 
 <script>
+const warningBox = document.getElementById("warning");
 const input = document.getElementById("password");
 const fill = document.getElementById("fill");
 const label = document.getElementById("label");
@@ -78,7 +84,12 @@ input.onkeyup = async function(){
     const data = await res.json();
 
     fill.style.width = data.percent+"%";
-    
+    if(data.warning){
+        warningBox.innerText = data.warning;
+    }
+    else{
+        warningBox.innerText = "";
+    }
     if(data.strength==="Weak"){
         fill.style.background="red";
     }
